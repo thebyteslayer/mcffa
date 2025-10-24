@@ -2,9 +2,13 @@ plugins {
     kotlin("jvm") version "1.9.21"
 }
 
-group = "com.thebyteslayer.minecraft.event.ffa"
+group = "com.thebyteslayer.minecraft.ffa"
 version = "1.0.0"
-description = "Event FFA Plugin for Paper 1.21.1"
+description = "FFA Plugin for Paper 1.21.1"
+
+base {
+    archivesName.set("FFA")
+}
 
 repositories {
     mavenCentral()
@@ -15,6 +19,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("com.google.code.gson:gson:2.10.1")
 }
 
 tasks {
@@ -36,7 +41,7 @@ tasks {
         exclude("META-INF/*.RSA")
 
         manifest {
-            attributes["Main-Class"] = "com.thebyteslayer.minecraft.event.ffa.EventFFAPlugin"
+            attributes["Main-Class"] = "com.thebyteslayer.minecraft.ffa.FFAPlugin"
         }
     }
 

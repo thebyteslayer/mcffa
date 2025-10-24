@@ -25,56 +25,17 @@ podium:
 
 # Border settings
 border:
+  center_x: 0.0  # X coordinate for border center
+  center_z: 0.0  # Z coordinate for border center
+  radius: 1000   # Initial border radius in blocks
   shrink_per_time: 50  # blocks to shrink every interval
   shrink_interval: 300  # seconds between shrinks
 
 # Air drop settings
 air_drop:
-  spawn_time: 60  # seconds after block is set before chest spawns
-  cooldown: 180   # seconds between air drops
-
-# Messages
-messages:
-  first_rtp: "&6Welcome to FFA! &eYou have been teleported to the arena."
-  respawn_rtp: "&aRespawned! &eYou have been teleported back to the arena."
-  kill: "&c{player} &7was killed by &c{killer}&7!"
-  death: "&7{player} &cdied&7!"
-  streak_broken: "&c{player}&7's &e{streak} &7kill streak was broken by &c{killer}&7!"
+  drop_time: 30   # seconds after announcement before drop lands
+  interval: 180   # seconds between air drop spawns
 
 # Sounds
 sounds:
   kill: "ENTITY_PLAYER_LEVELUP"  # sound played globally on kills
-
-# Loot table for air drops
-loot_table:
-  - material: "DIAMOND_SWORD"
-    amount: 1
-    chance: 0.1
-  - material: "IRON_SWORD"
-    amount: 1
-    chance: 0.3
-  - material: "STONE_SWORD"
-    amount: 1
-    chance: 0.6
-  - material: "GOLDEN_APPLE"
-    amount: 1-3
-    chance: 0.8
-  - material: "POTION"
-    amount: 1
-    chance: 0.5
-    data: "STRENGTH:180:0"  # type:duration:amplifier
-  - material: "BOW"
-    amount: 1
-    chance: 0.4
-  - material: "ARROW"
-    amount: 16-32
-    chance: 0.7
-  - material: "DIAMOND_CHESTPLATE"
-    amount: 1
-    chance: 0.2
-  - material: "IRON_CHESTPLATE"
-    amount: 1
-    chance: 0.4
-  - material: "LEATHER_CHESTPLATE"
-    amount: 1
-    chance: 0.8

@@ -1,0 +1,10 @@
+# FFA Messages Configuration
+
+# RTP Messages
+first_rtp: "&6Welcome to FFA! &eYou have been teleported to the arena."
+respawn_rtp: "&aRespawned! &eYou have been teleported back to the arena."
+
+# Combat Messages
+kill: "&c{player} &7was killed by &c{killer}&7!"
+death: "&7{player} &cdied&7!"
+streak_broken: "&c{player}&7's &e{streak} &7kill streak was broken by &c{killer}&7!"

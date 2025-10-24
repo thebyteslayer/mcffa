@@ -1,14 +1,34 @@
-name: EventFFA
+name: FFA
 version: 1.0.0
-main: com.thebyteslayer.minecraft.event.ffa.EventFFAPlugin
+main: com.thebyteslayer.minecraft.ffa.FFAPlugin
 api-version: "1.21"
 authors: [TheByteSlayer]
-description: FFA Event Plugin for Paper 1.21.1
+description: FFA Plugin for Paper 1.21.1
 
 commands:
-  ffa:
-    description: Main FFA command
-    usage: /ffa <init|start|leaderboard|stop>
+  environment:
+    description: Initialize FFA environment
+    usage: /environment
+    permission: eventffa.admin
+  start:
+    description: Start FFA session
+    usage: /start
+    permission: eventffa.admin
+  stop:
+    description: Stop FFA session
+    usage: /stop
+    permission: eventffa.admin
+  leaderboard:
+    description: Show FFA leaderboard
+    usage: /leaderboard
+    aliases: [lb]
+    permission: eventffa.admin
+  rtp:
+    description: Teleport to random location during FFA
+    usage: /rtp
+  reload:
+    description: Reload all configuration files
+    usage: /reload
     permission: eventffa.admin
 
 permissions:
