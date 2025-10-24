@@ -1,0 +1,17 @@
+name: EventFFA
+version: 1.0.0
+main: com.thebyteslayer.minecraft.event.ffa.EventFFAPlugin
+api-version: "1.21"
+authors: [TheByteSlayer]
+description: FFA Event Plugin for Paper 1.21.1
+
+commands:
+  ffa:
+    description: Main FFA command
+    usage: /ffa <init|start|leaderboard|stop>
+    permission: eventffa.admin
+
+permissions:
+  eventffa.admin:
+    description: Allows access to FFA admin commands
+    default: op
