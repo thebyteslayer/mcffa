@@ -25,12 +25,10 @@ class ffa(private val plugin: FFAPlugin) {
 
     fun startFFA(sender: Player): Boolean {
         if (isActive) {
-            sender.sendMessage("§cFFA is already active!")
             return false
         }
 
         if (Bukkit.getOnlinePlayers().isEmpty()) {
-            sender.sendMessage("§cNo players online to start FFA!")
             return false
         }
 
@@ -63,7 +61,6 @@ class ffa(private val plugin: FFAPlugin) {
         // Start air drops
         airDropManager.startAirDrops()
 
-        sender.sendMessage("§aFFA started! Players teleported and session begun.")
         return true
     }
 
@@ -129,7 +126,7 @@ class ffa(private val plugin: FFAPlugin) {
     }
 
     fun getLeaderboard(): List<String> {
-        if (!isActive) return listOf("§cFFA is not active!")
+        if (!isActive) return emptyList()
 
         val sortedStats = playerStats.entries
             .sortedByDescending { it.value.kills }
@@ -140,7 +137,17 @@ class ffa(private val plugin: FFAPlugin) {
             val player = Bukkit.getPlayer(uuid)
             val name = player?.name ?: "Unknown"
             val place = index + 1
-            leaderboard.add("§e$place. §f$name §7- §c${stats.kills} kills §7- §a${stats.killStreak} streak")
+
+            // Color the first three places differently
+            val placeColor = when (place) {
+                1 -> "§6" // Gold for 1st
+                2 -> "§7" // Gray for 2nd
+                3 -> "§c" // Red for 3rd
+                else -> "§e" // Yellow for others
+            }
+
+            // Use icons from suffix system instead of text
+            leaderboard.add("$placeColor$place. §f$name §7- §c${stats.kills}⚔ §7- §a${stats.killStreak}🔥")
         }
 
         return leaderboard
@@ -153,12 +160,16 @@ class ffa(private val plugin: FFAPlugin) {
 
         // Check for kill streak broken
         if (killer != null && victimStats.killStreak >= 3) {
-            val streakBrokenMessage = plugin.messagesConfig.getString("streak_broken", "{player}'s &c{streak} &7kill streak was broken by &c{killer}&7!")
-                ?.replace("{player}", victim.name)
-                ?.replace("{killer}", killer.name)
-                ?.replace("{streak}", victimStats.killStreak.toString())
-            if (streakBrokenMessage != null) {
-                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', streakBrokenMessage))
+            val streakBrokenMessage = plugin.messagesConfig.getString("broadcast.streak_broken")!!
+                .replace("{player}", victim.name)
+                .replace("{killer}", killer.name)
+                .replace("{streak}", victimStats.killStreak.toString())
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', streakBrokenMessage))
+
+            // Play streak broken sound globally
+            val streakBrokenSound = Sound.valueOf(plugin.soundsConfig.getString("streak_broken")!!)
+            for (player in Bukkit.getOnlinePlayers()) {
+                player.playSound(player.location, streakBrokenSound, 1.0f, 1.0f)
             }
         }
 
@@ -174,25 +185,47 @@ class ffa(private val plugin: FFAPlugin) {
                 killerStats.bestKillStreak = killerStats.killStreak
             }
 
+            // Check for kill streak announcement
+            if (killerStats.killStreak >= 3) {
+                val streakMessage = plugin.messagesConfig.getString("broadcast.streak")!!
+                    .replace("{player}", killer.name)
+                    .replace("{streak}", killerStats.killStreak.toString())
+                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', streakMessage))
+
+                // Play streak sound globally
+                val streakSound = Sound.valueOf(plugin.soundsConfig.getString("streak")!!)
+                for (player in Bukkit.getOnlinePlayers()) {
+                    player.playSound(player.location, streakSound, 1.0f, 1.0f)
+                }
+            }
+
             // Play kill sound globally
-            val sound = Sound.valueOf(plugin.config.getString("sounds.kill", "ENTITY_PLAYER_LEVELUP") ?: "ENTITY_PLAYER_LEVELUP")
+            val sound = Sound.valueOf(plugin.soundsConfig.getString("kill")!!)
             for (player in Bukkit.getOnlinePlayers()) {
                 player.playSound(player.location, sound, 1.0f, 1.0f)
             }
 
             // Send kill message
-            val killMessage = plugin.messagesConfig.getString("kill", "{player} was killed by {killer}!")
-                ?.replace("{player}", victim.name)
-                ?.replace("{killer}", killer.name)
-            if (killMessage != null) {
-                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', killMessage))
+            val killMessage = plugin.messagesConfig.getString("broadcast.kill")!!
+                .replace("{killed_player}", victim.name)
+                .replace("{killer}", killer.name)
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', killMessage))
+
+            // Play death sound globally
+            val deathSound = Sound.valueOf(plugin.soundsConfig.getString("death")!!)
+            for (player in Bukkit.getOnlinePlayers()) {
+                player.playSound(player.location, deathSound, 1.0f, 1.0f)
             }
         } else {
             // Send death message
-            val deathMessage = plugin.messagesConfig.getString("death", "{player} died!")
-                ?.replace("{player}", victim.name)
-            if (deathMessage != null) {
-                Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', deathMessage))
+            val deathMessage = plugin.messagesConfig.getString("broadcast.death")!!
+                .replace("{player}", victim.name)
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', deathMessage))
+
+            // Play death sound globally
+            val deathSound = Sound.valueOf(plugin.soundsConfig.getString("death")!!)
+            for (player in Bukkit.getOnlinePlayers()) {
+                player.playSound(player.location, deathSound, 1.0f, 1.0f)
             }
         }
     }
@@ -208,21 +241,24 @@ class ffa(private val plugin: FFAPlugin) {
     }
 
     private fun startBorderShrink() {
-        val shrinkAmount = plugin.config.getInt("border.shrink_per_time", 50)
-        val interval = plugin.config.getInt("border.shrink_interval", 300) * 20L // Convert to ticks
+        val shrinkAmount = plugin.config.getInt("border.shrink.amount", 1)
+        val interval = plugin.config.getInt("border.shrink.interval", 60) * 20L // Convert to ticks
+        val limit = plugin.config.getInt("border.shrink.limit", 10)
 
         borderShrinkTask = plugin.server.scheduler.runTaskTimer(plugin, Runnable {
             if (!isActive) return@Runnable
 
             currentBorderSize -= shrinkAmount
-            if (currentBorderSize < 50) currentBorderSize = 50.0
+            if (currentBorderSize < limit) currentBorderSize = limit.toDouble()
 
             val world = Bukkit.getWorlds().first()
             world.worldBorder.size = currentBorderSize
 
             // Warn players
+            val message = plugin.messagesConfig.getString("broadcast.border_shrink")!!
+                .replace("{size}", currentBorderSize.toInt().toString())
             for (player in Bukkit.getOnlinePlayers()) {
-                player.sendMessage("§cBorder shrinking to ${currentBorderSize.toInt()}x${currentBorderSize.toInt()} blocks!")
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', message))
             }
         }, interval, interval)
     }

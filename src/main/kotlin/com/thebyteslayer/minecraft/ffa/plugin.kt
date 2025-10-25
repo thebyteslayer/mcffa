@@ -14,14 +14,20 @@ class FFAPlugin : JavaPlugin() {
     lateinit var scoreboardManager: scoreboard
     lateinit var rtpManager: rtp
     lateinit var messagesConfig: YamlConfiguration
+    lateinit var soundsConfig: YamlConfiguration
 
     override fun onEnable() {
         saveDefaultConfig()
         saveResource("messages.yml", false)
+        saveResource("sounds.yml", false)
 
         // Load messages configuration
         val messagesFile = File(dataFolder, "messages.yml")
         messagesConfig = YamlConfiguration.loadConfiguration(messagesFile)
+
+        // Load sounds configuration
+        val soundsFile = File(dataFolder, "sounds.yml")
+        soundsConfig = YamlConfiguration.loadConfiguration(soundsFile)
 
         environmentManager = environment(this)
         ffaManager = ffa(this)

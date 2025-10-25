@@ -28,6 +28,11 @@ class reload(private val plugin: FFAPlugin) : CommandExecutor {
         plugin.messagesConfig = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(messagesFile)
         sender.sendMessage("§aReloaded messages.yml")
 
+        // Reload sounds.yml
+        val soundsFile = File(plugin.dataFolder, "sounds.yml")
+        plugin.soundsConfig = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(soundsFile)
+        sender.sendMessage("§aReloaded sounds.yml")
+
         // Reload loot.json - this will be loaded on next air drop spawn
         // The airDrop manager will reload it when needed
         sender.sendMessage("§aLoot.json will be reloaded on next air drop spawn")

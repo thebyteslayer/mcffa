@@ -7,7 +7,7 @@ version = "1.0.0"
 description = "FFA Plugin for Paper 1.21.1"
 
 base {
-    archivesName.set("FFA")
+    archivesName.set("ffa")
 }
 
 repositories {

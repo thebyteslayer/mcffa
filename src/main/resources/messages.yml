@@ -1,10 +1,45 @@
-# FFA Messages Configuration
+command:
+  no_permission: "§cYou don't have permission to use this command!"
+  player_only: "§cThis command can only be used by players!"
+  environment_success: "Successfully initialized environment"
+  start_countdown: "Event starting in {time} {time_label}"
+  start_success: "Event Started"
+  start_already_active: "Cant start the Event, a Session is already active"
+  end_countdown: "Event ending in {time} {time_label}"
+  end_success: "The Event Ended"
+  end_no_session: "Cant end the Event, no Session is active"
+  reload_success: "Reloaded Plugin successfully"
 
-# RTP Messages
-first_rtp: "&6Welcome to FFA! &eYou have been teleported to the arena."
-respawn_rtp: "&aRespawned! &eYou have been teleported back to the arena."
+immersive:
+  join:
+    title: "Event Started"
+    subtitle: "Kill as many Players as possible"
+  respawn:
+    title: "Respawned"
+    subtitle: "You respawned"
+  kill:
+    title: "Kill"
+    subtitle: "You killed {player}"
+  airdrop_collect:
+    title: "AirDrop collected"
+    subtitle: "You collected an AirDrop"
+  end:
+    title: "You placed #{place}"
+    subtitle: "Congratulations, you placed #{place}"
 
-# Combat Messages
-kill: "&c{player} &7was killed by &c{killer}&7!"
-death: "&7{player} &cdied&7!"
-streak_broken: "&c{player}&7's &e{streak} &7kill streak was broken by &c{killer}&7!"
+broadcast:
+  respawn: "{player} respawned"
+  kill: "{killed_player} killed by {killer}"
+  death: "{player} died"
+  streak: "{player} is on a Streak of {streak}"
+  streak_broken: "{player}'s {streak} kill streak was broken by {killer}!"
+  airdrop_incoming: "AirDrop landing at [{x}, {y}] in {time} {time_label}"
+  airdrop_countdown: "AirDrop landing in {time} {time_label}"
+  airdrop_landed: "AirDrop landed at [{x}, {y}]"
+  airdrop_collect: "AirDrop at {x}, {y} collected by {player}"
+  border_shrink: "Border shrunk to {size}x{size}"
+  border_shrink_countdown: "Border shrinking in {time} {time_label}"
+
+leaderboard:
+  entry: "{place}. {name} - {kills} kills - {streak} streak"
+  none: "No leaderboard data available"

@@ -1,4 +1,4 @@
-name: FFA
+name: ffa
 version: 1.0.0
 main: com.thebyteslayer.minecraft.ffa.FFAPlugin
 api-version: "1.21"
@@ -14,18 +14,15 @@ commands:
     description: Start FFA session
     usage: /start
     permission: eventffa.admin
-  stop:
-    description: Stop FFA session
-    usage: /stop
+  end:
+    description: End FFA session
+    usage: /end
     permission: eventffa.admin
   leaderboard:
     description: Show FFA leaderboard
     usage: /leaderboard
     aliases: [lb]
     permission: eventffa.admin
-  rtp:
-    description: Teleport to random location during FFA
-    usage: /rtp
   reload:
     description: Reload all configuration files
     usage: /reload

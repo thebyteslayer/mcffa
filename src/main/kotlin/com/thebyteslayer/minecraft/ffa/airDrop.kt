@@ -61,22 +61,50 @@ class airDrop(private val plugin: FFAPlugin, private val ffaManager: ffa) {
         }
 
         if (location != null) {
+            val dropTime = plugin.config.getInt("air_drop.drop_time", 30)
+            val showTimes = setOf(30, 20, 10, 5, 3, 2, 1) // Only show countdown at these specific times
+
             // Announce air drop immediately
+            val initialMessage = plugin.messagesConfig.getString("broadcast.airdrop_incoming")!!
+                .replace("{x}", location.x.toInt().toString())
+                .replace("{y}", location.z.toInt().toString())
+                .replace("{time}", dropTime.toString())
+                .replace("{time_label}", "seconds")
             for (player in Bukkit.getOnlinePlayers()) {
-                player.sendMessage("§6Air drop incoming at ${location.x.toInt()}, ${location.z.toInt()}!")
+                player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&', initialMessage))
+            }
+
+            // Play airdrop landing sound globally
+            val landingSound = org.bukkit.Sound.valueOf(plugin.soundsConfig.getString("airdrop_landing")!!)
+            for (player in Bukkit.getOnlinePlayers()) {
+                player.playSound(player.location, landingSound, 1.0f, 1.0f)
+            }
+
+            // Show countdown messages
+            for (remainingTime in showTimes) {
+                if (remainingTime != dropTime) { // Skip initial time since we already showed it
+                    plugin.server.scheduler.runTaskLater(plugin, Runnable {
+                        if (!ffaManager.isFFAStarted()) return@Runnable
+                        val timeLabel = if (remainingTime == 1) "second" else "seconds"
+                        val countdownMessage = plugin.messagesConfig.getString("broadcast.airdrop_countdown")!!
+                            .replace("{time}", remainingTime.toString())
+                            .replace("{time_label}", timeLabel)
+                        for (player in Bukkit.getOnlinePlayers()) {
+                            player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&', countdownMessage))
+                        }
+                    }, (dropTime - remainingTime) * 20L)
+                }
             }
 
             // Drop air drop after delay
-            val dropTime = plugin.config.getInt("air_drop.drop_time", 30) * 20L
+            val dropTimeTicks = dropTime * 20L
             plugin.server.scheduler.runTaskLater(plugin, Runnable {
                 if (!ffaManager.isFFAStarted()) return@Runnable
 
                 // Check if the chest location is empty (don't break blocks)
                 if (!location.block.isEmpty) {
                     // Location is occupied, skip this air drop
-                    for (player in Bukkit.getOnlinePlayers()) {
-                        player.sendMessage("§cAir drop location was occupied and could not land!")
-                    }
+                    // Note: Occupied check was removed, air drops now always land
                     return@Runnable
                 }
 
@@ -133,11 +161,20 @@ class airDrop(private val plugin: FFAPlugin, private val ffaManager: ffa) {
                 }
 
                 // Announce that the air drop has landed
+                val landedMessage = plugin.messagesConfig.getString("broadcast.airdrop_landed")!!
+                    .replace("{x}", location.x.toInt().toString())
+                    .replace("{y}", location.z.toInt().toString())
                 for (player in Bukkit.getOnlinePlayers()) {
-                    player.sendMessage("§6Air drop has landed at ${location.x.toInt()}, ${location.z.toInt()}!")
+                    player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&', landedMessage))
                 }
 
-            }, dropTime)
+                // Play airdrop landed sound globally
+                val landedSound = org.bukkit.Sound.valueOf(plugin.soundsConfig.getString("airdrop_landed")!!)
+                for (player in Bukkit.getOnlinePlayers()) {
+                    player.playSound(player.location, landedSound, 1.0f, 1.0f)
+                }
+
+            }, dropTimeTicks)
         }
     }
 
